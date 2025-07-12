@@ -1,3 +1,5 @@
+import csv
+import io
 from typing import Any
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -13,6 +15,8 @@ class JumiaPageDescription:
     price_tag_value: str = "-fs24"
     details_tag_by: str = By.CLASS_NAME
     details_tag_value: str = "-sc"
+    specifications_tag_by: str = By.XPATH
+    specifications_tag_value: str = "//div[@class='markup -pam']"
 
 
 class JumiaContent:
@@ -21,11 +25,13 @@ class JumiaContent:
     title: str
     price: str
     details: str
+    specifications: str | None
 
-    def __init__(self, title, price, details):
+    def __init__(self, title, price, details, specifications=None):
         self.title = title
         self.price = price
         self.details = details
+        self.specifications = specifications
 
     @classmethod
     def from_page(
@@ -44,6 +50,9 @@ class JumiaContent:
             details=page.find_element(
                 description.details_tag_by, description.details_tag_value
             ).text,
+            specifications=page.find_element(
+                description.specifications_tag_by, description.specifications_tag_value
+            ).text,
         )
 
     def __str__(self):
@@ -51,3 +60,19 @@ class JumiaContent:
 
     def __repr__(self):
         return f"{str(self)!r}"
+
+    def as_list(self):
+        """title, price, details, specifications"""
+        return [self.title, self.price, self.details, self.specifications]
+
+    def as_dict(self):
+        """title, price, details, specifications"""
+        return {
+            "title": self.title,
+            "price": self.price,
+            "details": self.details,
+            "specifications": self.specifications,
+        }
+
+    def write_to_as_csv(self, buffer):
+        """Write To A Buffer"""

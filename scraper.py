@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 
 from jumia.descriptor import PAGE_DESCRIPTION, JumiaContent
+from jumia.utils import find_and_close_popup
 
 
 def create_firefox_driver(headless=False):
@@ -74,6 +75,8 @@ driver.get("https://www.jumia.com.ng/")
 
 time.sleep(5)
 
+find_and_close_popup(driver)
+
 footer = driver.find_element(By.TAG_NAME, "footer")
 
 action_chain = webdriver.ActionChains(driver)
@@ -87,18 +90,27 @@ anchors_with_matched_links = get_page_links(driver=driver)
 
 jumia_contents = []
 
-for href in {e.get_attribute("href") for e in anchors_with_matched_links}:
-    try:
-        driver.get(href)
-        time.sleep(5)
-        jumia_contents.append(JumiaContent.from_page(driver))
-    except Exception as e:
-        print(f"failed {e}")
 
-    print(jumia_contents)
+def get_pages_contents(
+    limits: int | None = None,
+    elements=anchors_with_matched_links,
+    storage=jumia_contents,
+) -> list[JumiaContent]:
+    filtered = [e.get_attribute("href") for e in elements]
+    for href in filtered[: limits or len(filtered)]:
+        try:
+            driver.get(href)
+            time.sleep(5)
+            storage.append(JumiaContent.from_page(driver))
+        except Exception as e:
+            print(f"failed {e}")
+    return storage
 
 
-print(jumia_contents)
+storage = get_pages_contents(5)
+
+for i in storage:
+    print(i.as_dict())
 
 # search = driver.find_element(By.NAME, "q")
 # search.clear()
@@ -108,7 +120,7 @@ print(jumia_contents)
 time.sleep(20)
 
 
-print(driver.page_source)
+# print(driver.page_source)
 
 if __name__ == "__main__":
     driver.quit()
