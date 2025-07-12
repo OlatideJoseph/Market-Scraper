@@ -1,5 +1,6 @@
 import time
 import re
+import csv
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -69,7 +70,7 @@ def get_page_links(driver, link_description=PAGE_DESCRIPTION):
     )
 
 
-driver = create_chrome_driver()
+driver = create_chrome_driver(headless=True)
 
 driver.get("https://www.jumia.com.ng/")
 
@@ -107,10 +108,14 @@ def get_pages_contents(
     return storage
 
 
-storage = get_pages_contents(5)
+storage = get_pages_contents(6)
 
-for i in storage:
-    print(i.as_dict())
+with open("filename.csv", "w+") as f:
+    fieldnames = ["title", "price", "details", "specifications"]
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+    for i in storage:
+        print(writer.writerow(i.as_dict()))
 
 # search = driver.find_element(By.NAME, "q")
 # search.clear()
