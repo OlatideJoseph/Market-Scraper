@@ -31,36 +31,49 @@ def attribute_matches(
 
 
 def cloudfare_captcha(driver: WEBDRIVERS):
+    """This function assumes you gotten to cloudfare iframe or the main document"""
     import time
 
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 100)
+    shadow = driver.find_element(By.CSS_SELECTOR, "body").shadow_root
+
+    print(shadow, "shadow_root")
+
     try:
+        wait._driver = shadow
         checkbox = wait.until(
-            EC.presence_of_element_located(
-                (
-                    By.XPATH,
-                    "//*[starts-with(@id, 'verifying')]//input[@type='checkbox']",
-                )
-            )
+            EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='checkbox']"))
         )
+        print("Found Check Box")
+        
+        checkbox.click()
+        
+        
+
         time.sleep(25)
+        print("Captcha Clicked")
         return checkbox
-        return driver.find_element(
-            By.XPATH, "//*[starts-with(@id, 'verifying')]"
-        ).find_element(By.XPATH, "//input[@type='checkbox']")
     except NoSuchElementException:
         return None
     except AttributeError:
         return None
     except TypeError:
         return None
+    finally:
+        wait._driver = driver
 
 
 def verify_cloudfare_captcha(driver: WEBDRIVERS):
-    import time
-    time.sleep(20)
-    frame = driver.find_element(By.XPATH, "//*[@id=\"cf-chl-widget-x13kc\"]")
+    wait = WebDriverWait(driver, 100)
+    main_element = wait.until(EC.presence_of_element_located((By.ID, "vVgbN6")))
+    wait._driver = main_element
+    div = wait.until(EC.presence_of_element_located((By.TAG_NAME, "div")))
+    div = div.find_element(By.TAG_NAME, "div") if div else div
+    shaow_root1 = div.shadow_root
+    wait._driver = shaow_root1
+    frame = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "iframe")))
     print(frame)
+    print(frame.screenshot("frame-screenshot.png"))
     driver.switch_to.frame(frame)
     checkbox = cloudfare_captcha(driver)
     print(checkbox)
@@ -68,24 +81,24 @@ def verify_cloudfare_captcha(driver: WEBDRIVERS):
     return driver
 
 
-
 def verify_cloudfare_captcha2(driver: WEBDRIVERS):
     try:
         frame = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((
-                By.XPATH,
-                "//iframe[contains(@title, 'challenge') or contains(@src, 'cf-challenge')]"
-            ))
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    "//iframe[contains(@title, 'challenge') or contains(@src, 'cf-challenge')]",
+                )
+            )
         )
         print("[INFO] Captcha iframe found.")
-        
+
         driver.switch_to.frame(frame)
 
         checkbox = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((
-                By.XPATH,
-                "//input[@type='checkbox' or @id='cf-challenge-checkbox']"
-            ))
+            EC.presence_of_element_located(
+                (By.XPATH, "//input[@type='checkbox' or @id='cf-challenge-checkbox']")
+            )
         )
         print("[INFO] Captcha checkbox located:", checkbox)
 
@@ -95,4 +108,3 @@ def verify_cloudfare_captcha2(driver: WEBDRIVERS):
         print("[ERROR] Failed to verify Cloudflare CAPTCHA:", e)
         driver.switch_to.default_content()
         return None
-
