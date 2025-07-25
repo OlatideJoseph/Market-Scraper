@@ -9,41 +9,7 @@ from selenium.webdriver.common.keys import Keys
 from jumia.descriptor import PAGE_DESCRIPTION, JumiaContent
 from jumia.utils import find_and_close_popup, sign_in
 
-from utils import attribute_matches
-
-def create_firefox_driver(headless=False):
-    """Creates A Driver For Firefox"""
-    from webdriver_manager.firefox import GeckoDriverManager
-    from selenium.webdriver.firefox.service import Service
-
-    installed = GeckoDriverManager().install()
-    service = Service(executable_path=installed)
-
-    option = webdriver.FirefoxOptions()
-
-    if headless:
-        option.add_argument("--headless")
-
-    driver = webdriver.Firefox(service=service)
-
-    return driver
-
-
-def create_chrome_driver(headless=False):
-    """Creates A Driver For Chrome"""
-    from webdriver_manager.chrome import ChromeDriverManager
-    from selenium.webdriver.chrome.service import Service
-
-    option = webdriver.ChromeOptions()
-    if headless:
-        option.add_argument("--headless")
-
-    service = Service(ChromeDriverManager().install())
-
-    driver = webdriver.Chrome(service=service, options=option)
-    return driver
-
-
+from utils import attribute_matches, create_chrome_driver
 
 
 def get_page_links(driver, link_description=PAGE_DESCRIPTION):
@@ -55,7 +21,6 @@ def get_page_links(driver, link_description=PAGE_DESCRIPTION):
 driver = create_chrome_driver(headless=False)
 
 driver.get("https://www.jumia.com.ng/")
-
 
 
 find_and_close_popup(driver)
@@ -75,8 +40,6 @@ anchors_with_matched_links = get_page_links(driver=driver)
 jumia_contents = []
 
 
-
-
 def get_pages_contents(
     limits: int | None = None,
     elements=anchors_with_matched_links,
@@ -91,8 +54,6 @@ def get_pages_contents(
         except Exception as e:
             print(f"failed {e}")
     return storage
-
-
 
 
 # storage = get_pages_contents(6)

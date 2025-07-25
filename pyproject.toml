@@ -9,5 +9,6 @@ dependencies = [
     "lxml>=6.0.0",
     "pytesseract>=0.3.13",
     "selenium>=4.34.0",
+    "selenium-stealth>=1.0.6",
     "webdriver-manager>=4.0.2",
 ]

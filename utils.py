@@ -1,4 +1,5 @@
 import re
+from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.firefox.webdriver import WebDriver as FireFoxWebDriver
@@ -9,6 +10,38 @@ from selenium.webdriver.support import expected_conditions as EC
 
 WEBDRIVERS = WebDriver | FireFoxWebDriver
 
+
+def create_firefox_driver(headless=False):
+    """Creates A Driver For Firefox"""
+    from webdriver_manager.firefox import GeckoDriverManager
+    from selenium.webdriver.firefox.service import Service
+
+    installed = GeckoDriverManager().install()
+    service = Service(executable_path=installed)
+
+    option = webdriver.FirefoxOptions()
+
+    if headless:
+        option.add_argument("--headless")
+
+    driver = webdriver.Firefox(service=service)
+
+    return driver
+
+
+def create_chrome_driver(headless=False):
+    """Creates A Driver For Chrome"""
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.service import Service
+
+    option = webdriver.ChromeOptions()
+    if headless:
+        option.add_argument("--headless")
+
+    service = Service(ChromeDriverManager().install())
+
+    driver = webdriver.Chrome(service=service, options=option)
+    return driver
 
 def element_attribute_matches(
     element: WebElement, attr: str = "href", reg_exp: str = r"*"

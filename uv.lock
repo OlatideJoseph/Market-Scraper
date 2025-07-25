@@ -174,6 +174,7 @@ dependencies = [
     { name = "lxml" },
     { name = "pytesseract" },
     { name = "selenium" },
+    { name = "selenium-stealth" },
     { name = "webdriver-manager" },
 ]
 
@@ -183,6 +184,7 @@ requires-dist = [
     { name = "lxml", specifier = ">=6.0.0" },
     { name = "pytesseract", specifier = ">=0.3.13" },
     { name = "selenium", specifier = ">=4.34.0" },
+    { name = "selenium-stealth", specifier = ">=1.0.6" },
     { name = "webdriver-manager", specifier = ">=4.0.2" },
 ]
 
@@ -360,6 +362,17 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/13/44/a6df7eae7fe929f18ffe08221fb05215ce991adc718bbe693a8d46ff09b7/selenium-4.34.0.tar.gz", hash = "sha256:8b7eb05a0ed22f9bb2187fd256c28630824ad01d8397b4e68bc0af7dabf26c80", size = 895790, upload-time = "2025-06-29T07:30:09.263Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/11/b3/6a043a6968f263e90537b48870f7366f91a6d4c5cc67e5b656311c98d0f5/selenium-4.34.0-py3-none-any.whl", hash = "sha256:fc3535cfd99a073c21bf9091519b48ed31b34bf2cbd132f62e8c732b2e815b2d", size = 9403599, upload-time = "2025-06-29T07:30:07.012Z" },
+]
+
+[[package]]
+name = "selenium-stealth"
+version = "1.0.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "selenium" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/ac/7877df8b819d54a4e317a093a0a9e0a38d21d884a7250aa713f2f0869442/selenium_stealth-1.0.6-py3-none-any.whl", hash = "sha256:b62da5452aa4a84f29a4dfb21a9696aff20788a7c570dd0b81bc04a940848b97", size = 32195, upload-time = "2020-11-05T15:26:05.24Z" },
 ]
 
 [[package]]
