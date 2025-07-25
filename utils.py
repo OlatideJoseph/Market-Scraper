@@ -1,12 +1,19 @@
 import re
+import logging
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.firefox.webdriver import WebDriver as FireFoxWebDriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    StaleElementReferenceException,
+)
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+
+logger = logging.getLogger(__name__,)
+logger.setLevel(logging.INFO)
 
 WEBDRIVERS = WebDriver | FireFoxWebDriver
 
@@ -43,10 +50,15 @@ def create_chrome_driver(headless=False):
     driver = webdriver.Chrome(service=service, options=option)
     return driver
 
+
 def element_attribute_matches(
     element: WebElement, attr: str = "href", reg_exp: str = r"*"
 ):
-    return bool(re.match(reg_exp, element.get_attribute(attr)))
+    try:
+        return bool(re.match(reg_exp, element.get_attribute(attr)))
+    except StaleElementReferenceException as e:
+        logger.warning("Got a StaleReferenceException %r" % e, exc_info=True)
+        return False
 
 
 def attribute_matches(
@@ -78,10 +90,8 @@ def cloudfare_captcha(driver: WEBDRIVERS):
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='checkbox']"))
         )
         print("Found Check Box")
-        
+
         checkbox.click()
-        
-        
 
         time.sleep(25)
         print("Captcha Clicked")

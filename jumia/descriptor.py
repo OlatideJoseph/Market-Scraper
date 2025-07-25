@@ -1,6 +1,7 @@
 import re
 from typing import Any, List
 from dataclasses import dataclass
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
@@ -52,6 +53,8 @@ class JumiaContent:
     ):
         assert match_page(page)
         description = page_description
+        # Trying To Get The Commment Along
+        comments = JumiaCommentContent.from_page(page)
         return cls(
             title=page.find_element(
                 description.title_tag_by, description.title_tag_value
@@ -113,8 +116,13 @@ class JumiaCommentContent:
     author: str
 
     @classmethod
-    def from_page(cls, page: WEBDRIVERS, comment_description: JumiaCommentDescription):
+    def from_page(cls, page: WEBDRIVERS, comment_description: JumiaCommentDescription=JumiaCommentDescription):
         assert match_page(page)
+        page_comment_section = cls.find_comment_section(page)
+        ActionChains(page).scroll_to_element(page_comment_section).perform()
+        see_all_link = cls.get_see_all(page)
+        ActionChains(see_all_link).click().perform()
+        page.back()
         return cls(header="")
 
     @staticmethod
@@ -145,4 +153,10 @@ class JumiaCommentContent:
             EC.element_to_be_clickable(
                 By.XPATH, "//a[@class='pg'][@aria-label='Next Page']"
             )
+        )
+
+    @staticmethod
+    def get_see_all(page: WEBDRIVERS):
+        return page.find_element(
+            By.XPATH, "/html/body/div[1]/main/div[2]/div[2]/section[2]/header/a"
         )
